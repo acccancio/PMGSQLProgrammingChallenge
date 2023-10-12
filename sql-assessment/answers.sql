@@ -51,10 +51,32 @@ GROUP BY campaign_info.name;
 
 #BONUS
 
-SELECT FORMAT(date,'dddd') AS day_of_week, SUM(impressions) as total_impressions, SUM(clicks) as total_clicks, SUM(clicks)/SUM(impressions) AS clickthrough_rate
-FROM marketing_performance
-GROUP BY date
+SELECT
+    day_of_week,
+    AVG(total_impressions) AS total_impressions,
+    AVG(total_clicks) AS total_clicks,
+    AVG(total_clicks) / AVG(total_impressions) AS clickthrough_rate
+FROM (
+    SELECT
+        CASE
+            WHEN WEEKDAY(date) = 0 THEN 'Sunday'
+            WHEN WEEKDAY(date) = 1 THEN 'Monday'
+            WHEN WEEKDAY(date) = 2 THEN 'Tuesday'
+            WHEN WEEKDAY(date) = 3 THEN 'Wednesday'
+            WHEN WEEKDAY(date) = 4 THEN 'Thursday'
+            WHEN WEEKDAY(date) = 5 THEN 'Friday'
+            WHEN WEEKDAY(date) = 6 THEN 'Saturday'
+        END AS day_of_week,
+        AVG(impressions) AS total_impressions,
+        AVG(clicks) AS total_clicks
+    FROM
+        marketing_performance
+    GROUP BY
+        day_of_week
+) AS subquery
+GROUP BY
+    day_of_week
+ORDER BY
+    day_of_week;
 
-'Answer: If the objective is to drive awareness and engagement in running ads, Saturday would be the most appropriate day of the week for this execution. Additionally, impressions and clicks are second highest on Saturdays compared to other days, with a relatively high CTR of 83%.'
-
-
+'Answer: If the objective is to drive awareness and engagement in running ads, Friday would be the most appropriate day of the week for this execution. Additionally, impressions and clicks are second highest on Saturdays compared to other days, with a relatively high CTR of 83%.'
